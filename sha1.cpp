@@ -59,7 +59,7 @@ string SHA_1(const char msg[]){
 	uint64_t _l = _l_m << 3;
 	uint32_t  _r = LEN_448 - (_l %  LEN_512);
 	assert(_r % 8 == 0);
-	uint64_t _L = (_l_m >> 9) + 1;
+	uint64_t _L = (_l >> 9) + 1;
 	vector<uint64_t> digest_array;
 	uint64_t pow = 7;
 	for (int i = 0; i < _l_m; i++){
@@ -74,23 +74,34 @@ string SHA_1(const char msg[]){
 		push_group(digest_array,pow,(tmp >> (i << 3)));
 		tmp = tmp & ((1LL << (i << 3)) - 1);
 	}
-	vector<uint64_t> Y[_L];
+	vector<vector<uint64_t> > Y;
+	for (int i = 0; i < _L; i++){
+		 vector<uint64_t> w;
+		 Y.push_back(w);
+	}
 	pow = 0;
 	uint64_t group = 0;
 	for (int i = 0; i < (uint64_t)digest_array.size(); i++)
 	{
 		div_group(Y[group],digest_array[i],pow,group);
 	}
-	vector<uint32_t> W[_L];
+
+	vector<vector<uint32_t> > W;
+	for (int i = 0; i < _L; i++){
+		 vector<uint32_t> w;
+		 W.push_back(w);
+	}
 	uint32_t TEMP[5];
 	for (int i = 0; i < 5; i++){
 		TEMP[i] = CACHE[i];
 	}
 	for (int i = 0; i < _L; i++){
+		 for (int k = 0;  k < 5; k++){
+		 	CACHE[k] = TEMP[k];
+		 }
 		 for (int k = 0; k < 16; k++){
 		 	 W[i].push_back((uint32_t)Y[i][k]);
 		 }
-		 //cout << endl;
 		 for (int k = 16; k < 80; k++){
 		 	W[i].push_back(W[i][k - 3] ^ W[i][k - 8] ^ W[i][k - 14] ^ W[i][k - 16]);
 		 	W[i][k] = shift_L(W[i][k],1);
@@ -117,9 +128,7 @@ string SHA_1(const char msg[]){
 	for (int i = (int)res.size(); i < 40; i++)
 		z.push_back('0');
 	return z + res;
-	//print(digest_array);
 }
 int main(){
-	cout << SHA_1("dfasdfajkgljdfgljaskjdglajslfgjlkajfdlaljsdflasdf") << endl;
-	//cout << CHAR_END << endl;
+	cout << SHA_1("dfasdfajkgljdfgljaskjdglajslfgjlkajfdlaljsdflasdfsdsdsdswqwertyuiopqwe") << endl;
 }
